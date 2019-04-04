@@ -210,6 +210,7 @@ static const struct option optab[] = {
 	{ "traditional",	no_argument,		NULL,	'c' },
 	{ "use-lc-numeric",	no_argument,		& use_lc_numeric, 1 },
 	{ "version",		no_argument,		& do_version, 'V' },
+	{ "pcap",               optional_argument,      NULL, 'a'},
 	{ NULL, 0, NULL, '\0' }
 };
 
@@ -582,7 +583,7 @@ usage(int exitval, FILE *fp)
 	/* GNU long options info. This is too many options. */
 
 	fputs(_("POSIX options:\t\tGNU long options: (standard)\n"), fp);
-	fputs(_("\t-a [live]\t\t\n"), fp);
+	fputs(_("\t-a pcap/live\t\t--pcap=pcap/live\n"), fp);
 	fputs(_("\t-f progfile\t\t--file=progfile\n"), fp);
 	fputs(_("\t-F fs\t\t\t--field-separator=fs\n"), fp);
 	fputs(_("\t-v var=val\t\t--assign=var=val\n"), fp);
