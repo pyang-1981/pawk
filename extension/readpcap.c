@@ -42,6 +42,12 @@ static awk_bool_t (*init_func)(void) = init_readpcap;
 int plugin_is_GPL_compatible;
 #define _(msg) ext_id, msg
 
+//  do_flags tell whether pcap mode (live or offline) is enabled or not.
+extern int do_flags;
+//  pcap mode flags. Has to keep in sync with main.c.
+static int  DO_PCAP_LIVE = 0x8000;
+static int DO_PCAP_OFFLINE = 0x10000;
+
 void
 init_net_field(struct net_field **nf)
 {
@@ -562,16 +568,12 @@ readpcap_can_take_file(const awk_input_buf_t *iobuf)
     
         if (NULL == iobuf)
 	        return (awk_false);
-    
-        if (!sym_lookup("PROCINFO", AWK_ARRAY, &array))
-	        return (awk_false);
-    
-        (void) make_const_string("readpcap", 8, &index);
-    
-        if (!get_array_element(array.array_cookie, &index, AWK_UNDEFINED, &value))
-	        return (awk_false);
-    
-        return (awk_true);
+
+	if ((do_flags | DO_PCAP_LIVE) || (do_flags | DO_PCAP_OFFLINE)) {
+	        return (awk_true);
+	}
+
+	return (awk_false);
 }
 
 static awk_bool_t

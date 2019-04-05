@@ -1,7 +1,5 @@
 @load "readpcap"
 
-BEGIN { PROCINFO["readpcap"] = 1 }
-
 {
     print $.ts
 }
