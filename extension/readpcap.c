@@ -28,7 +28,6 @@ static struct net_field_descriptor PKT_FIELDS[] = {
 	{.name = "caplen", .field_func = get_pkt_caplen},
 };
 
-
 static struct protocol_descriptor PKT_PROTO = {
 	.name = "packet",
 	.fields = PKT_FIELDS,
