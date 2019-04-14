@@ -3,6 +3,7 @@
 
 #include <pcap.h>
 #include <ether.h>
+#include <ip.h>
 
 /*
  * Data link layer protocols.
@@ -38,6 +39,7 @@ static struct dlt_proto dlt_2_proto[] = {
  * Network layer protocols.
  */
 static struct protocol_descriptor* NET_LAYER_PROTOS[] = {
+        &ipv4_protocol,
 	NULL,
 };
 

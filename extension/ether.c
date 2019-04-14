@@ -97,8 +97,10 @@ get_ether_dst_addr(const u_char* buf, size_t buf_len, void* ctx)
 	if (NULL == dst_addr)
 		do_fatal("can not allocate Ethernet destination address");
 	
-        if (buf_len < ETHER_HDRLEN)
+        if (buf_len < ETHER_HDRLEN) {
+	        free(dst_addr);
 	        return NULL;
+	}
     
         eh = (struct ether_header *)buf;
         snprintf(dst_addr, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
@@ -122,8 +124,10 @@ get_ether_src_addr(const u_char* buf, size_t buf_len, void* ctx)
 	if (NULL == src_addr)
 		do_fatal("can not allocate Ethernet source address");
 	
-	if (buf_len < ETHER_HDRLEN)
+	if (buf_len < ETHER_HDRLEN) {
+	        free(src_addr);
 		return NULL;
+	}
 	
 	eh = (struct ether_header *)buf;
 	snprintf(src_addr, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
@@ -143,8 +147,9 @@ get_ether_type(const u_char* buf, size_t buf_len, void* ctx)
         struct ether_header *eh;
 	INIT_NET_FIELD(nf);
 	
-	if (buf_len < ETHER_HDRLEN)
+	if (buf_len < ETHER_HDRLEN) {
 		return NULL;
+	}
 	
 	eh = (struct ether_header *)buf;
 	nf->val.n_val = ntohs(eh->ether_length_type);
