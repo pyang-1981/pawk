@@ -36,6 +36,7 @@
 		DEREF(r); \
 	} \
 }
+
 int
 r_interpret(INSTRUCTION *code)
 {
@@ -51,6 +52,7 @@ r_interpret(INSTRUCTION *code)
 	Regexp *rp;
 	NODE *set_array = NULL;	/* array with a post-assignment routine */
 	NODE *set_idx = NULL;	/* the index of the array element */
+	bool in_qual_field = false; /* whether in a special context of handling qualified network field name */
 
 
 /* array subscript */
@@ -162,6 +164,13 @@ top:
 			}
 				
 			switch (m->type) {
+			case Node_var_qual_start:
+			  /* Starting field of a qualified network field name */
+				in_qual_field = true;
+				m->var_value = dupnode(Nnull_string);
+				PUSH(make_str_node(m->vname, strlen(m->vname), QUAL_START));
+				break;
+
 			case Node_var:
 				if (do_lint && var_uninitialized(m))
 					lintwarn(isparam ?
@@ -176,22 +185,21 @@ top:
 			case Node_var_new:
 			/* in pcap mode, this is allowed */
 uninitialized_scalar:
-                                if (pc->nexti->opcode == Op_field_spec && (do_pcap_offline || do_pcap_live)) {
-				        /* pcap mode, convert a variable to a string of the same name, and
-					   push it on to the stack */
-				        m->var_value = dupnode(Nnull_string);  /* if it is malloced, just increase the ref count */
-				        PUSH(make_str_node(m->vname, strlen(m->vname), 0));
+        if (in_qual_field) {
+				  /* Handling a qualified network field name */
+				  m->var_value = dupnode(Nnull_string);  /* if it is malloced, just increase the ref count */
+				  PUSH(make_str_node(m->vname, strlen(m->vname), 0));
 				} else {
-				        m->type = Node_var;
-				        m->var_value = dupnode(Nnull_string);
-				        if (do_lint)
-					        lintwarn(isparam ?
-						        _("reference to uninitialized argument `%s'") :
-						        _("reference to uninitialized variable `%s'"),
-								save_symbol->vname);
-				        m = dupnode(Nnull_string);
-				        PUSH(m);
-			        }
+				  m->type = Node_var;
+				  m->var_value = dupnode(Nnull_string);
+				  if (do_lint)
+					  lintwarn(isparam ?
+						         _("reference to uninitialized argument `%s'") :
+						         _("reference to uninitialized variable `%s'"),
+					save_symbol->vname);
+				  m = dupnode(Nnull_string);
+				  PUSH(m);
+			  }
 				break;
 
 			case Node_var_array:
@@ -231,75 +239,91 @@ uninitialized_scalar:
 
 		case Op_subscript:
 			t2 = mk_sub(pc->sub_count);
-			t1 = POP_ARRAY();
-
-			if (do_lint && in_array(t1, t2) == NULL) {
-				t2 = force_string(t2);
-				lintwarn(_("reference to uninitialized element `%s[\"%.*s\"]'"),
-					array_vname(t1), (int) t2->stlen, t2->stptr);
-				if (t2->stlen == 0)
-					lintwarn(_("subscript of array `%s' is null string"), array_vname(t1));
-			}
-
-			/* for FUNCTAB, get the name as the element value */
-			if (t1 == func_table) {
-				static bool warned = false;
-				
-				if (do_lint && ! warned) {
-					warned = true;
-					lintwarn(_("FUNCTAB is a gawk extension"));
-				}
-				r = t2;
+			if (in_qual_field) {
+				/* create a string repr node */
+				NODE *new_sub;
+				new_sub = force_string_subscript(t2);
+				PUSH(new_sub);
+				DEREF(t2);
 			} else {
-				/* make sure stuff like NF, NR, are up to date */
-				if (t1 == symbol_table)
-					update_global_values();
+			  t1 = POP_ARRAY();
 
-				r = *assoc_lookup(t1, t2);
-			}
-			DEREF(t2);
+			  if (do_lint && in_array(t1, t2) == NULL) {
+				  t2 = force_string(t2);
+				  lintwarn(_("reference to uninitialized element `%s[\"%.*s\"]'"),
+					  array_vname(t1), (int) t2->stlen, t2->stptr);
+				  if (t2->stlen == 0)
+					  lintwarn(_("subscript of array `%s' is null string"), array_vname(t1));
+			  }
 
-			/* for SYMTAB, step through to the actual variable */
-			if (t1 == symbol_table) {
-				static bool warned = false;
+			  /* for FUNCTAB, get the name as the element value */
+			  if (t1 == func_table) {
+				  static bool warned = false;
 				
-				if (do_lint && ! warned) {
-					warned = true;
-					lintwarn(_("SYMTAB is a gawk extension"));
-				}
-				if (r->type == Node_var)
-					r = r->var_value;
-			}
+				  if (do_lint && ! warned) {
+					  warned = true;
+					  lintwarn(_("FUNCTAB is a gawk extension"));
+				  }
+				  r = t2;
+			  } else {
+				  /* make sure stuff like NF, NR, are up to date */
+				  if (t1 == symbol_table)
+					  update_global_values();
 
-			if (r->type == Node_val)
-				UPREF(r);
-			PUSH(r);
+				  r = *assoc_lookup(t1, t2);
+			  }
+			  DEREF(t2);
+
+			  /* for SYMTAB, step through to the actual variable */
+			  if (t1 == symbol_table) {
+				  static bool warned = false;
+				
+				  if (do_lint && ! warned) {
+					  warned = true;
+					  lintwarn(_("SYMTAB is a gawk extension"));
+				  }
+				  if (r->type == Node_var)
+					  r = r->var_value;
+			  }
+
+			  if (r->type == Node_val)
+				  UPREF(r);
+			  PUSH(r);
+			}
 			break;
 
 		case Op_sub_array:
 			t2 = mk_sub(pc->sub_count);
-			t1 = POP_ARRAY();
-			r = in_array(t1, t2);
-			if (r == NULL) {
-				r = make_array();
-				r->parent_array = t1;
-				lhs = assoc_lookup(t1, t2);
-				unref(*lhs);
-				*lhs = r;
-				t2 = force_string(t2);
-				r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
+			if (in_qual_field) {
+        /* create a string repr node */
+				NODE *new_sub;
+				new_sub = force_string_subscript(t2);
+				PUSH(new_sub);
+				DEREF(t2);
+			} else {
+		    t1 = POP_ARRAY();
+			  r = in_array(t1, t2);
+			  if (r == NULL) {
+				  r = make_array();
+				  r->parent_array = t1;
+				  lhs = assoc_lookup(t1, t2);
+				  unref(*lhs);
+				  *lhs = r;
+				  t2 = force_string(t2);
+				  r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
 
-				/* execute post-assignment routine if any */
-				if (t1->astore != NULL)
-					(*t1->astore)(t1, t2);
-			} else if (r->type != Node_var_array) {
-				t2 = force_string(t2);
-				fatal(_("attempt to use scalar `%s[\"%.*s\"]' as an array"),
-						array_vname(t1), (int) t2->stlen, t2->stptr);
+				  /* execute post-assignment routine if any */
+				  if (t1->astore != NULL)
+					  (*t1->astore)(t1, t2);
+			  } else if (r->type != Node_var_array) {
+				  t2 = force_string(t2);
+				  fatal(_("attempt to use scalar `%s[\"%.*s\"]' as an array"),
+						  array_vname(t1), (int) t2->stlen, t2->stptr);
+			  }
+
+			  DEREF(t2);
+			  PUSH(r);
 			}
-
-			DEREF(t2);
-			PUSH(r);
 			break;
 
 		case Op_subscript_lhs:
@@ -356,26 +380,26 @@ uninitialized_scalar:
 			break;
 
 		case Op_field_spec:
-		        if (do_pcap_offline || do_pcap_live) {
-			        t1 = TOP_STRING();
-			        lhs = r_get_field(curfile, t1, (Func_ptr *)0, false);
-			        decr_sp();
+		  if (in_qual_field) {
+				in_qual_field = false;
+				t1 = assemble_qual_field_name();
+			  lhs = r_get_field(curfile, t1, (Func_ptr *)0, false);
 				DEREF(t1);
 				r = (*lhs)->var_value;
 				UPREF(r);
 				PUSH(r);
 			} else {
-			        t1 = TOP_SCALAR();
-			        lhs = r_get_field(NULL, t1, (Func_ptr *) 0, true);
-			        decr_sp();
-			        DEREF(t1);
-			        /* only for $0, up ref count */
-			        if (*lhs == fields_arr[0]) {
-				        r = *lhs;
-				        UPREF(r);
-			        } else
-				        r = dupnode(*lhs);
-			        PUSH(r);
+			  t1 = TOP_SCALAR();
+			  lhs = r_get_field(NULL, t1, (Func_ptr *) 0, true);
+			  decr_sp();
+			  DEREF(t1);
+			  /* only for $0, up ref count */
+			  if (*lhs == fields_arr[0]) {
+				  r = *lhs;
+				  UPREF(r);
+			  } else
+				  r = dupnode(*lhs);
+			  PUSH(r);
 			}
 			break;
 

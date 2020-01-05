@@ -29,62 +29,62 @@
 
 #define INITIAL_STACK	20
 
-static size_t size;
-static void **stack;
-static int index = -1;
+//static size_t size;
+//static void **stack;
+//static int index = -1;
 
 /* stack_empty --- return true if stack is empty */
 
 int
-stack_empty()
+simple_stack_empty(const struct simple_stack *s)
 {
-	return index < 0;
+	return s->index < 0;
 }
 
 /* stack_top --- return top object on the stack */
 
 void *
-stack_top()
+simple_stack_top(const struct simple_stack *s)
 {
-	if (stack_empty() || stack == NULL)
+	if (simple_stack_empty(s) || s->elems == NULL)
 		return NULL;
 
-	return stack[index];
+	return s->elems[s->index];
 }
 
 /* stack_pop --- pop top object and return it */
 
 void *
-stack_pop()
+simple_stack_pop(struct simple_stack *s)
 {
-	if (stack_empty() || stack == NULL)
+	if (simple_stack_empty(s) || s->elems == NULL)
 		return NULL;
 
-	return stack[index--];
+	return s->elems[s->index--];
 }
 
 /* stack_push --- push an object onto the stack */
 
-int stack_push(void *object)
+int simple_stack_push(void *object, struct simple_stack *s)
 {
-	void **new_stack;
-	size_t new_size = 2 * size;
+	void **new_elems;
+	size_t new_size = 2 * s->size;
 
-	if (stack == NULL) {
-		stack = (void **) malloc(INITIAL_STACK * sizeof(void *));
-		if (stack == NULL)
+	if (s->elems == NULL) {
+		s->elems = (void **) malloc(INITIAL_STACK * sizeof(void *));
+		if (s->elems == NULL)
 			return 0;
-		size = INITIAL_STACK;
-	} else if (index + 1 >= size) {
-		if (new_size < size)
+		s->size = INITIAL_STACK;
+	} else if (s->index + 1 >= s->size) {
+		if (new_size < s->size)
 			return 0;
-		new_stack = realloc(stack, new_size * sizeof(void *));
-		if (new_stack == NULL)
+		new_elems = realloc(s->elems, new_size * sizeof(void *));
+		if (new_elems == NULL)
 			return 0;
-		size = new_size;
-		stack = new_stack;
+		s->size = new_size;
+		s->elems = new_elems;
 	}
 
-	stack[++index] = object;
+	s->elems[++s->index] = object;
 	return 1;
 }

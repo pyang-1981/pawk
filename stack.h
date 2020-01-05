@@ -23,9 +23,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-extern int stack_empty();	/* return true if stack is empty */
-extern void *stack_top();	/* return top object on the stack */
-extern void *stack_pop();	/* pop top object and return it */
-extern int stack_push(void *);	/* push an object onto the stack,
+struct simple_stack {
+  void **elems;
+	size_t size;
+	int index;
+};
+
+extern int simple_stack_empty(const struct simple_stack *s);	/* return true if stack is empty */
+extern void *simple_stack_top(const struct simple_stack *s);	/* return top object on the stack */
+extern void *simple_stack_pop(struct simple_stack *s);	/* pop top object and return it */
+extern int simple_stack_push(void *item, struct simple_stack *s);	/* push an object onto the stack,
 				 * return 0 if failed, 1 if success 
 				 */

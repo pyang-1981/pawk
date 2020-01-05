@@ -1726,6 +1726,51 @@ subscript_list
 	  { $$ = $1; }
 	;
 
+field
+  : NAME
+	  {
+			$1->memory = variable($1->source_line, $1->lextok, Node_var_new);
+		  $1->opcode = Op_push;
+			$$ = $1;
+		}
+	;
+
+subscripted_field
+  : NAME subscript_list
+	  {
+			$1->memory = variable($1->source_line, $1->lextok, Node_var_new);
+		  $1->opcode = Op_push;
+      $$ = list_prepend($2, $1);
+		}
+	;
+
+field_list
+  : field
+	  {
+			$$ = list_create($1);
+		}
+	| subscripted_field
+	  {
+			$$ = $1;
+		}
+	| field_list '.' field
+	  {
+		  $$ = list_append($1, $3);
+		}
+	| field_list '.' subscripted_field
+	  {
+		  $$ = list_merge($1, $3);
+		}
+	;
+
+qual_field_name
+  : field '.' field_list
+	  {
+			$1->memory->type = Node_var_qual_start;
+		  $$ = list_prepend($3, $1);
+		}
+	;
+
 simple_variable
 	: NAME
 	  {
@@ -1742,25 +1787,10 @@ simple_variable
 		$1->opcode = Op_push_array;
 		$$ = list_prepend($2, $1);
 	  }
-	 | NAME '.' NAME
-	   {
-	       /* qualified network field name */
-	       char *qual_field_name;
-	       size_t len1 = strlen($1->lextok), len2 = strlen($3->lextok);
-	       emalloc(qual_field_name, char *, len1 + len2 + 2, "simple_variable");
-	       strncpy(qual_field_name, $1->lextok, len1);
-	       qual_field_name[len1] = '.';
-	       strncpy(qual_field_name + len1 + 1, $3->lextok, len2);
-	       qual_field_name[len1+len2+1] = '\0';
-	       
-	       efree($3->lextok);
-	       bcfree($3);
-	       efree($1->lextok);
-	       $1->lextok = qual_field_name;
-	       $1->opcode = Op_push;
-	       $1->memory = variable($1->source_line, qual_field_name, Node_var_new);
-	       $$ = list_create($1);
-	   }
+	| qual_field_name
+	  {
+      $$ = $1;
+		}
 	;
 
 variable
@@ -1784,7 +1814,8 @@ variable
 	  }
 	| '$' '.' simple_variable
 	  {
-	         $$ = list_append($3, $1);
+			/* $ is an instruction with opcode Op_field_spec */
+	    $$ = list_append($3, $1);
 	  }
 	;
 
