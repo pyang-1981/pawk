@@ -448,6 +448,7 @@ typedef struct gawk_api {
 
 	/* Functions to print messages */
 	void (*api_fatal)(awk_ext_id_t id, const char *format, ...);
+	void (*api_fatal_v)(awk_ext_id_t id, const char *format, va_list args);
 	void (*api_warning)(awk_ext_id_t id, const char *format, ...);
 	void (*api_lintwarn)(awk_ext_id_t id, const char *format, ...);
 
@@ -701,6 +702,7 @@ typedef struct gawk_api {
 	(api->api_set_argument(ext_id, count, new_array))
 
 #define fatal		api->api_fatal
+#define fatal_v        api->api_fatal_v
 #define warning		api->api_warning
 #define lintwarn	api->api_lintwarn
 
