@@ -1447,11 +1447,11 @@ parse_args(int argc, char **argv)
 
 		switch (c) {
 		case 'a':
-		        if (optarg == NULL || optarg[0] == '\0')
-		                do_flags |= DO_PCAP_OFFLINE;
-		        else if (strncmp("live", optarg, 4) == 0)
-		                do_flags |= DO_PCAP_LIVE;
-		        break;	  
+		  if (optarg == NULL || optarg[0] == '\0')
+		    do_flags |= DO_PCAP_OFFLINE;
+		  else if (strncmp("live", optarg, 4) == 0)
+		    do_flags |= DO_PCAP_LIVE;
+		  break;	  
 		case 'F':
 			add_preassign(PRE_ASSIGN_FS, optarg);
 			break;

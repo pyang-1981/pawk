@@ -54,7 +54,7 @@ MY_MODULE_FLAGS = -module -avoid-version -no-undefined
 MY_LIBS = $(LTLIBINTL)
 PCAP_LIBS = -lpcap
 
-filefuncs_la_SOURCES  = filefuncs.c stack.h stack.c gawkfts.h \
+filefuncs_la_SOURCES  = filefuncs.c gawkfts.h \
 			gawkfts.c gawkdirfd.h
 filefuncs_la_LDFLAGS  = $(MY_MODULE_FLAGS)
 filefuncs_la_LIBADD   = $(MY_LIBS)
@@ -79,7 +79,7 @@ readdir_la_SOURCES    = readdir.c gawkdirfd.h
 readdir_la_LDFLAGS    = $(MY_MODULE_FLAGS)
 readdir_la_LIBADD     = $(MY_LIBS)
 
-readpcap_la_SOURCES   = readpcap.c hashmap.c dlname.c ether.c protocol.h pcap_builtin_def.h pcap_builtin.h
+readpcap_la_SOURCES   = readpcap.c hashmap.c dlname.c ether.c protocol.h pcap_builtin_def.h pcap_builtin.h ip.c tcp.c
 readpcap_la_LDFLAGS   = $(MY_MODULE_FLAGS)
 readpcap_la_LIBADD    = $(MY_LIBS) $(PCAP_LIBS)
 

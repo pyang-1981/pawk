@@ -300,6 +300,9 @@ typedef enum nodevals {
 	Node_frame,
 	Node_instruction,
 
+	/* Mark the start of a qualified network field name */
+	Node_var_qual_start,
+
 	Node_final		/* sentry value, not legal */
 } NODETYPE;
 
@@ -429,8 +432,9 @@ typedef struct exp_node {
 #		define	HALFHAT		0x10000       /* half-capacity Hashed Array Tree;
 		                                      * See cint_array.c */
 #		define	XARRAY		0x20000
-#               define  BINCUR          0x40000      /* binary value is current */
-#               define  BINARY          0x80000      /* assigned as binary */
+#   define  BINCUR    0x40000      /* binary value is current */
+#   define  BINARY    0x80000      /* assigned as binary */
+#   define  QUAL_START 0x100000    /* mark the start component of a qualified network field name */
 } NODE;
 
 #define vname sub.nodep.name
@@ -1467,7 +1471,6 @@ typedef enum {
 } awk_field_t;
 
 
-
 /* gawkapi.c: */
 extern gawk_api_t api_impl;
 extern void init_ext_api(void);
@@ -1774,6 +1777,8 @@ force_string(NODE *s)
 		    && (s->stfmt == -1 || s->stfmt == CONVFMTidx)
 	)
 		return s;
+	if ((s->flags & BINCUR) != 0)
+	  return s;
 	return format_val(CONVFMT, CONVFMTidx, s);
 }
 

@@ -46,10 +46,10 @@
  * Structure of an Ethernet header.
  */
 struct	ether_header {
-	uint8_t		ether_dhost[ETHER_ADDR_LEN];
-	uint8_t		ether_shost[ETHER_ADDR_LEN];
-	uint16_t	ether_length_type;
-};
+  uint8_t		ether_dhost[ETHER_ADDR_LEN];
+  uint8_t		ether_shost[ETHER_ADDR_LEN];
+  uint16_t	ether_length_type;
+}  __attribute__ ((packed));
 
 /*
  * Length of an Ethernet header; note that some compilers may pad
@@ -61,99 +61,144 @@ struct	ether_header {
 /* ====================== End of Berkeley code ===================== */
 
 #include <stdio.h>
+#include <string.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <ether.h>
 
 static struct net_field *
-get_ether_dst_addr(const u_char *buf, size_t buf_len, void *ctx);
+get_ether_dst_addr(const u_char *buf, size_t buf_len, ...);
 static struct net_field *
-get_ether_src_addr(const u_char *buf, size_t buf_len, void *ctx);
+get_ether_src_addr(const u_char *buf, size_t buf_len, ...);
 static struct net_field *
-get_ether_type(const u_char *buf, size_t buf_len, void *ctx);
+get_ether_type(const u_char *buf, size_t buf_len, ...);
+static struct net_field *
+get_ether_payload(const u_char *buf, size_t buf_len, ...);
 
 struct net_field_descriptor ether_fields[] = {
-	{.name = "dst_addr", .field_func = get_ether_dst_addr},
-	{.name = "src_addr", .field_func = get_ether_src_addr},
-	{.name = "type", .field_func = get_ether_type},
+  {.name = "dst_addr", .is_regex = false, .field_func = get_ether_dst_addr},
+  {.name = "src_addr", .is_regex = false, .field_func = get_ether_src_addr},
+  {.name = "type", .is_regex = false, .field_func = get_ether_type},
+  {.name = "payload", .is_regex = false, .field_func = get_ether_payload},
+  {.name = NULL, .field_func = NULL}
 };
 
+static int
+ether_proto_init(const u_char *buf, size_t buf_size);
 
 struct protocol_descriptor ether_protocol = {
-	.name =  "Ethernet",
-	.fields = ether_fields,
-	.ctx = NULL,
-	.init = NULL,
-	.clean = NULL,
+  .name =  "Ethernet",
+  .fields = ether_fields,
+  .init = ether_proto_init,
+  .init_once = NULL,
+  .clean = NULL,
+  .upper_proto = NULL
 };
 
-static struct net_field *
-get_ether_dst_addr(const u_char* buf, size_t buf_len, void* ctx)
+static int
+ether_proto_init(const u_char *buf, size_t buf_size)
 {
-	struct ether_header *eh;
-	INIT_NET_FIELD(nf);
-	
-	char *dst_addr = (char *)malloc(18);
-	if (NULL == dst_addr)
-		do_fatal("can not allocate Ethernet destination address");
-	
-        if (buf_len < ETHER_HDRLEN) {
-	        free(dst_addr);
-	        return NULL;
-	}
-    
-        eh = (struct ether_header *)buf;
-        snprintf(dst_addr, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
-		eh->ether_dhost[0], eh->ether_dhost[1], eh->ether_dhost[2],
-		eh->ether_dhost[3], eh->ether_dhost[4], eh->ether_dhost[5]);
-	
-	nf->val.s_val = dst_addr;
-	nf->val.n_val = 17;
-	nf->type = awk_str_t;
-	
-	return nf;
+  return ETHER_HDRLEN;
 }
 
 static struct net_field *
-get_ether_src_addr(const u_char* buf, size_t buf_len, void* ctx)
+get_ether_dst_addr(const u_char* buf, size_t buf_len, ...)
 {
-        struct ether_header *eh;
-	INIT_NET_FIELD(nf);
-	
-	char *src_addr = (char *)malloc(18);
-	if (NULL == src_addr)
-		do_fatal("can not allocate Ethernet source address");
-	
-	if (buf_len < ETHER_HDRLEN) {
-	        free(src_addr);
-		return NULL;
-	}
-	
-	eh = (struct ether_header *)buf;
-	snprintf(src_addr, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
-		eh->ether_shost[0], eh->ether_shost[1], eh->ether_shost[2],
-		eh->ether_shost[3], eh->ether_shost[4], eh->ether_shost[5]);
-	
-	nf->val.s_val = src_addr;
-	nf->val.n_val = 17;
-	nf->type = awk_str_t;
-	
-	return nf;
+  struct ether_header *eh;
+  INIT_NET_FIELD(nf);
+
+  char *dst_addr = (char *)malloc(18);
+  if (dst_addr == NULL) {
+    do_fatal("can not allocate Ethernet destination address");
+  }
+
+  if (buf_len < ETHER_HDRLEN) {
+    do_fatal("not enough buffer length for Ethernet header: "
+	          "expect at least %d bytes, have %d bytes",
+	          ETHER_HDRLEN, buf_len);
+  }
+
+  eh = (struct ether_header *)buf;
+  snprintf(dst_addr, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
+	        eh->ether_dhost[0], eh->ether_dhost[1], eh->ether_dhost[2],
+	        eh->ether_dhost[3], eh->ether_dhost[4], eh->ether_dhost[5]);
+
+  nf->str_val = dst_addr;
+  nf->str_len = 17;
+  nf->type = awk_str_t;
+
+  return nf;
 }
 
 static struct net_field *
-get_ether_type(const u_char* buf, size_t buf_len, void* ctx)
+get_ether_src_addr(const u_char* buf, size_t buf_len, ...)
 {
-        struct ether_header *eh;
-	INIT_NET_FIELD(nf);
-	
-	if (buf_len < ETHER_HDRLEN) {
-		return NULL;
-	}
-	
-	eh = (struct ether_header *)buf;
-	nf->val.n_val = ntohs(eh->ether_length_type);
-	nf->type = awk_numbr_t;
-	
-	return nf;
+  struct ether_header *eh;
+  INIT_NET_FIELD(nf);
+
+  char *src_addr = (char *)malloc(18);
+  if (src_addr == NULL) {
+    do_fatal("can not allocate Ethernet source address");
+  }
+
+  if (buf_len < ETHER_HDRLEN) {
+    do_fatal("not enough buffer length for Ethernet header: "
+      	          "expect at least %d bytes, have %d bytes",
+      	          ETHER_HDRLEN, buf_len);
+  }
+
+  eh = (struct ether_header *)buf;
+  snprintf(src_addr, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
+	        eh->ether_shost[0], eh->ether_shost[1], eh->ether_shost[2],
+                eh->ether_shost[3], eh->ether_shost[4], eh->ether_shost[5]);
+
+  nf->str_val = src_addr;
+  nf->str_len = 17;
+  nf->type = awk_str_t;
+
+  return nf;
+}
+
+static struct net_field *
+get_ether_type(const u_char* buf, size_t buf_len, ...)
+{
+  struct ether_header *eh;
+  INIT_NET_FIELD(nf);
+
+  if (buf_len < ETHER_HDRLEN) {
+    do_fatal("not enough buffer length for Ethernet header: "
+            	  "expect at least %d bytes, have %d bytes",
+            	  ETHER_HDRLEN, buf_len);
+  }
+
+  eh = (struct ether_header *)buf;
+  nf->num_val = ntohs(eh->ether_length_type);
+  nf->type = awk_numbr_t;
+
+  return nf;
+}
+
+static struct net_field *
+get_ether_payload(const u_char *buf, size_t buf_len, ...)
+{
+  struct ether_header *eh;
+  INIT_NET_FIELD(nf);
+
+  if (buf_len < ETHER_HDRLEN) {
+    do_fatal("not enough buffer length for Ethernet header: "
+              	  "expect at least %d bytes, have %d bytes",
+              	  ETHER_HDRLEN, buf_len);
+  }
+
+  eh = (struct ether_header *)buf;
+  nf->bin_val = (char *)malloc(buf_len - ETHER_HDRLEN);
+  if (nf->bin_val == NULL) {
+    do_fatal("can not allocate Ethernet payload");
+  }
+
+  memcpy(nf->bin_val, buf + ETHER_HDRLEN, buf_len - ETHER_HDRLEN);
+  nf->bin_len = buf_len - ETHER_HDRLEN;
+  nf->type = awk_bin_t;
+
+  return nf;
 }

@@ -193,6 +193,13 @@ api_fatal(awk_ext_id_t id, const char *format, ...)
 	va_end(args);
 }
 
+static void
+api_fatal_v(awk_ext_id_t id, const char *format, va_list args)
+{
+        (void) id;
+        err(true, _("fatal: "), format, args);
+}
+
 /* api_warning --- print a warning message and exit */
 
 static void
@@ -422,7 +429,7 @@ node_to_awk_value(NODE *node, awk_value_t *val, awk_valtype_t wanted)
 			val->val_type = AWK_STRING;
 
 			(void) force_string(node);
-			if ((node->flags & STRCUR) != 0) {
+			if ((node->flags & STRCUR) != 0 || (node->flags & BINCUR) != 0) {
 				val->str_value.str = node->stptr;
 				val->str_value.len = node->stlen;
 				ret = awk_true;
@@ -1080,6 +1087,7 @@ gawk_api_t api_impl = {
 
 	/* message printing functions */
 	api_fatal,
+	api_fatal_v,
 	api_warning,
 	api_lintwarn,
 

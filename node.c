@@ -400,6 +400,9 @@ make_str_node(const char *s, size_t len, int flags)
 	r->numbr = 0;
 	/* If NO_FREE,  stptr will not be freed in unref */
 	r->flags = flags & NO_FREE? (STRING|STRCUR) : (MALLOC|STRING|STRCUR);
+	/* Mark the start of a qualified network field name */
+	if (flags & QUAL_START)
+	  r->flags |= QUAL_START;
 	r->valref = 1;
 	r->stfmt = -1;
 	r->wstptr = NULL;

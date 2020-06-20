@@ -137,6 +137,8 @@ get_inode(const char *fname)
 }
 #endif
 
+static struct simple_stack s = {.size = 0, .elems = NULL, .index = -1};
+
 static const gawk_api_t *api;	/* for convenience macros to work */
 static awk_ext_id_t *ext_id;
 static awk_bool_t init_filefuncs(void);
@@ -674,7 +676,7 @@ process(FTS *heirarchy, awk_array_t destarray, int seedot)
 			newdir_array = value.array_cookie;
 
 			/* push current directory */
-			stack_push(destarray);
+			simple_stack_push(destarray, &s);
 
 			/* new directory becomes current */
 			destarray = newdir_array;
@@ -741,9 +743,9 @@ process(FTS *heirarchy, awk_array_t destarray, int seedot)
 			fill_default_elements(dot_array, fentry, bad_ret);
 
 			/* now pop the parent directory off the stack */
-			if (! stack_empty()) {
+			if (! simple_stack_empty(&s)) {
 				/* pop stack */
-				destarray = stack_pop();
+				destarray = simple_stack_pop(&s);
 			}
 
 			break;

@@ -24,6 +24,7 @@
  */
 
 #include "awk.h"
+#include "stack.h"
 
 extern void after_beginfile(IOBUF **curfile);
 extern double pow(double x, double y);
@@ -1187,7 +1188,7 @@ r_get_field(IOBUF *iop, NODE *n, Func_ptr *assign, bool reference)
 	NODE **lhs;
 	
 	if (iop && iop->public.get_field) {
-	        awk_field_t ft;
+	  awk_field_t ft;
 		int ec = 0;
 		char *fn, *fs;
 		size_t fl;
@@ -1197,20 +1198,20 @@ r_get_field(IOBUF *iop, NODE *n, Func_ptr *assign, bool reference)
 			fatal(_("field name must be a string"));
 	        ft = iop->public.get_field(&iop->public, &ec, fn, &fs, &fl);
 		if (ec) {
-		        if (ft == awk_str_t) {
-			        FL_node->var_value = dupnode(Nnull_string);
+		  if (ft == awk_str_t) {
+			  FL_node->var_value = dupnode(Nnull_string);
 			} else if (ft == awk_bin_t) {
-			        FL_node->var_value = dupnode(Nnull_binary);
+			  FL_node->var_value = dupnode(Nnull_binary);
 			} else {
-			        FL_node->var_value = dupnode(Zero_numbr);
+			  FL_node->var_value = dupnode(Zero_numbr);
 			}
 		} else {
 			if (ft == awk_str_t) {
-			        FL_node->var_value = make_string(fs, fl);
+			  FL_node->var_value = make_string(fs, fl);
 			} else if (ft == awk_bin_t){
-			        FL_node->var_value = make_binary(fs, fl);
+			  FL_node->var_value = make_binary(fs, fl);
 			} else {
-			        FL_node->var_value = make_number(*((AWKNUM*)fs));
+			  FL_node->var_value = make_number(*((AWKNUM*)fs));
 			}
 		}
 		return &FL_node;
@@ -1797,6 +1798,70 @@ register_exec_hook(Func_pre_exec preh, Func_post_exec posth)
 	return true;
 }
 
+/* Utility routines handling qualified network field name */
+
+static NODE*
+force_string_subscript(NODE *n) \
+{
+	NODE *new_node = r_dupnode(n);
+	
+  new_node = force_string(new_node);
+	/* add [] around the string */
+  char *new_str = NULL;
+	emalloc(new_str, char *, new_node->stlen + 3, "Op_subscript");
+	new_str[0] = '[';
+	strncpy(new_str + 1, new_node->stptr, new_node->stlen);
+	new_str[new_node->stlen + 1] = ']';
+	new_str[new_node->stlen + 2] = '\0';
+  efree(new_node->stptr);
+	new_node->stptr = new_str;
+	new_node->stlen = new_node->stlen + 2;
+  return new_node;
+}
+
+static struct simple_stack s = {.size = 0, .elems = NULL, .index = -1};
+
+static NODE*
+assemble_qual_field_name()
+{
+  char *qual_field_name = NULL;
+	size_t total_len = 0, index = 0;
+  NODE *t, *first;
+	
+	while(!(TOP()->flags & QUAL_START)) {
+		t = POP();
+		total_len += (t->stlen + 1); // add one extra "."
+		simple_stack_push(t, &s);
+	}
+  t = POP();
+	total_len += t->stlen;
+	simple_stack_push(t, &s);
+
+  emalloc(qual_field_name, char *, total_len, "assemble_qual_field_name");
+	first = (NODE *)simple_stack_pop(&s);
+	strncpy(qual_field_name + index, first->stptr, first->stlen);
+	index += first->stlen;
+	while(!simple_stack_empty(&s)) {
+		t = (NODE *)simple_stack_pop(&s);
+		if (t->stptr[0] != '[') {
+      strncpy(qual_field_name + index + 1, t->stptr, t->stlen);
+			qual_field_name[index] = '.';
+			index += (t->stlen + 1);
+			DEREF(t);
+		} else {
+      strncpy(qual_field_name + index, t->stptr, t->stlen);
+      index += t->stlen;
+			DEREF(t);
+		}
+	}
+	qual_field_name[index] = '\0';
+
+	efree(first->stptr);
+	first->stptr = qual_field_name;
+	first->stlen = strlen(qual_field_name);
+
+	return first;
+}
 
 /* interpreter routine when not debugging */ 
 #include "interpret.h"

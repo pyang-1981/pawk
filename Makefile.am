@@ -121,7 +121,9 @@ base_sources = \
 	str_array.c \
 	symbol.c \
 	version.c \
-	xalloc.h
+	xalloc.h \
+	stack.c \
+	stack.h
 
 gawk_SOURCES = $(base_sources)
 
