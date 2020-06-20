@@ -79,7 +79,7 @@ readdir_la_SOURCES    = readdir.c gawkdirfd.h
 readdir_la_LDFLAGS    = $(MY_MODULE_FLAGS)
 readdir_la_LIBADD     = $(MY_LIBS)
 
-readpcap_la_SOURCES   = readpcap.c hashmap.c dlname.c ether.c protocol.h pcap_builtin_def.h pcap_builtin.h ip.c
+readpcap_la_SOURCES   = readpcap.c hashmap.c dlname.c ether.c protocol.h pcap_builtin_def.h pcap_builtin.h ip.c tcp.c
 readpcap_la_LDFLAGS   = $(MY_MODULE_FLAGS)
 readpcap_la_LIBADD    = $(MY_LIBS) $(PCAP_LIBS)
 

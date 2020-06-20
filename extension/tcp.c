@@ -57,7 +57,7 @@ struct tcp {
 	uint16_t	window;
 	uint16_t	check;
 	uint16_t	urg_ptr;
-};
+}  __attribute__ ((packed));
 
 //=============== End of the Linux source code ==============
 
