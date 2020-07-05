@@ -264,6 +264,18 @@ AC_CHECK_FUNC(getaddrinfo, [AC_DEFINE(HAVE_GETADDRINFO, 1, [have getaddrinfo])],
 AC_SEARCH_LIBS(fmod, m)
 AC_SEARCH_LIBS(isinf, m)
 AC_SEARCH_LIBS(ismod, m)
+AC_SEARCH_LIBS([pcap_open_offline], [pcap], [have_pcap=yes])
+if test "x${have_pcap}" = xyes; then
+        AC_CHECK_HEADERS([pcap.h], [], [have_pcap=no])
+fi
+if test "x${have_pcap}" = xno; then
+        AC_MSG_ERROR([
+----------------------------------------
+The pcap library and header files are required to build pawk.
+Stopping... Check 'config.log' for more information.
+----------------------------------------])
+fi
+
 dnl Don't look for libsigsegv on OSF/1, gives us severe headaches
 case $host_os in
 osf1)	: ;;
