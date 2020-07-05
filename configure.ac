@@ -41,6 +41,7 @@ fi
 
 AC_PREREQ(2.69)
 AM_INIT_AUTOMAKE([dist-xz dist-lzip])
+AM_MAINTAINER_MODE
 
 AC_CONFIG_MACRO_DIR([m4])
 
