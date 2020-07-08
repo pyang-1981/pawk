@@ -261,7 +261,7 @@ get_tcp_doff(const u_char *buf, size_t buf_len, ...)
   struct tcp *hdr = (struct tcp *)buf;
   INIT_NET_FIELD(nf);
 
-  nf->num_val = hdr->doff;
+  nf->num_val = hdr->doff << 2;
   nf->type = awk_numbr_t;
 
   return nf;
