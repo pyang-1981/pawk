@@ -72,7 +72,7 @@ SUBDIRS = \
 	test
 
 # what to make and install
-bin_PROGRAMS = gawk
+bin_PROGRAMS = pawk
 include_HEADERS = gawkapi.h
 
 # sources for both gawk and dgawk
@@ -125,7 +125,7 @@ base_sources = \
 	stack.c \
 	stack.h
 
-gawk_SOURCES = $(base_sources)
+pawk_SOURCES = $(base_sources)
 
 # Get extra libs as needed, Automake will supply LIBINTL and SOCKET_LIBS.
 LDADD = $(LIBSIGSEGV) $(LIBINTL) $(SOCKET_LIBS) $(LIBREADLINE) $(LIBMPFR)
