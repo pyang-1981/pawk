@@ -41,7 +41,7 @@ static struct net_field_descriptor PKT_FIELDS[] = {
 };
 
 static struct protocol_descriptor PKT_PROTO = {
-  .name = "packet",
+  .name = "PKT",
   .fields = PKT_FIELDS,
   .init = NULL,
   .init_once = NULL,
@@ -434,7 +434,7 @@ pio_get_field(char *qual_field_name, struct pcap_io *pio)
   }
 
   /* packet level info, use PKT_PROTO */
-  if (ns.proto_name == NULL) {
+  if (strcmp(ns.proto_name, "PKT") == 0) {
     /* packet level field */
     GET_NET_FIELD(ns.field_name, nf, &PKT_PROTO);
     if (IS_GUARD_NF(nf)) {
