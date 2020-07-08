@@ -10,7 +10,7 @@ $.IPv4.src_addr == "145.254.160.237" {
     # by the sequence number.
     # The empty string "" forcefully converts the
     # sequence number to its string representation.
-    time_sent[$.TCP.seq""] = $.ts
+    time_sent[$.TCP.seq""] = $.PKT.ts
 }
 $.IPv4.src_addr == "65.208.228.223" {
     # seen_acks stores all seen acknowledgment numbers.
@@ -31,7 +31,7 @@ $.IPv4.src_addr == "65.208.228.223" {
         next
     }
     if ($.TCP.ack == 1) {
-        avg_rtt = avg_rtt + $.ts - time_sent[($.TCP.ackno - 1)""]
+        avg_rtt = avg_rtt + $.PKT.ts - time_sent[($.TCP.ackno - 1)""]
         num_samples = num_samples + 1
     }
 }
