@@ -111,7 +111,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = gawk$(EXEEXT)
+bin_PROGRAMS = pawk$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/arch.m4 \
@@ -146,11 +146,11 @@ am__objects_1 = array.$(OBJEXT) awkgram.$(OBJEXT) builtin.$(OBJEXT) \
 	node.$(OBJEXT) profile.$(OBJEXT) random.$(OBJEXT) re.$(OBJEXT) \
 	regex.$(OBJEXT) replace.$(OBJEXT) str_array.$(OBJEXT) \
 	symbol.$(OBJEXT) version.$(OBJEXT) stack.$(OBJEXT)
-am_gawk_OBJECTS = $(am__objects_1)
-gawk_OBJECTS = $(am_gawk_OBJECTS)
-gawk_LDADD = $(LDADD)
+am_pawk_OBJECTS = $(am__objects_1)
+pawk_OBJECTS = $(am_pawk_OBJECTS)
+pawk_LDADD = $(LDADD)
 am__DEPENDENCIES_1 =
-gawk_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+pawk_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -190,8 +190,8 @@ am__v_YACC_ = $(am__v_YACC_@AM_DEFAULT_V@)
 am__v_YACC_0 = @echo "  YACC    " $@;
 am__v_YACC_1 = 
 YLWRAP = $(top_srcdir)/ylwrap
-SOURCES = $(gawk_SOURCES)
-DIST_SOURCES = $(gawk_SOURCES)
+SOURCES = $(pawk_SOURCES)
+DIST_SOURCES = $(pawk_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -543,7 +543,7 @@ base_sources = \
 	stack.c \
 	stack.h
 
-gawk_SOURCES = $(base_sources)
+pawk_SOURCES = $(base_sources)
 
 # Get extra libs as needed, Automake will supply LIBINTL and SOCKET_LIBS.
 LDADD = $(LIBSIGSEGV) $(LIBINTL) $(SOCKET_LIBS) $(LIBREADLINE) $(LIBMPFR)
@@ -659,9 +659,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-gawk$(EXEEXT): $(gawk_OBJECTS) $(gawk_DEPENDENCIES) $(EXTRA_gawk_DEPENDENCIES) 
-	@rm -f gawk$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(gawk_OBJECTS) $(gawk_LDADD) $(LIBS)
+pawk$(EXEEXT): $(pawk_OBJECTS) $(pawk_DEPENDENCIES) $(EXTRA_pawk_DEPENDENCIES) 
+	@rm -f pawk$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(pawk_OBJECTS) $(pawk_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
