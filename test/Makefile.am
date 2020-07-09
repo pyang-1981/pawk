@@ -1003,7 +1003,7 @@ EXTRA_DIST = \
   pawk/ping.pcap \
   pawk/ping_tsaddr.pcap \
   pawk/ping_ts.pcap \
-  pawk/run_tests.sh
+  pawk/run_tests.sh \
   pawk/test_ether.awk \
   pawk/test_ip.awk \
   pawk/test_ip_tsaddr.awk \

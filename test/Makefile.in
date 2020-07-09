@@ -1262,7 +1262,13 @@ EXTRA_DIST = \
   pawk/ping.pcap \
   pawk/ping_tsaddr.pcap \
   pawk/ping_ts.pcap \
-  pawk/run_tests.sh
+  pawk/run_tests.sh \
+  pawk/test_ether.awk \
+  pawk/test_ip.awk \
+  pawk/test_ip_tsaddr.awk \
+  pawk/test_ip_ts.awk \
+  pawk/test_rtt.awk \
+  pawk/test_tcp.awk
 
 TESTS_WE_ARE_NOT_DOING_YET_FIXME_ONE_DAY = longdbl
 
@@ -1574,12 +1580,6 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
-  pawk/test_ether.awk \
-  pawk/test_ip.awk \
-  pawk/test_ip_tsaddr.awk \
-  pawk/test_ip_ts.awk \
-  pawk/test_rtt.awk \
-  pawk/test_tcp.awk
 
 # Message stuff is to make it a little easier to follow.
 # Make the pass-fail last and dependent on others to avoid
