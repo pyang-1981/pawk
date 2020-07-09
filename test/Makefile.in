@@ -1257,7 +1257,12 @@ EXTRA_DIST = \
 	zeroe0.awk \
 	zeroe0.ok \
 	zeroflag.awk \
-	zeroflag.ok
+	zeroflag.ok \
+  pawk/http.pcap \
+  pawk/ping.pcap \
+  pawk/ping_tsaddr.pcap \
+  pawk/ping_ts.pcap \
+  pawk/run_tests.sh
 
 TESTS_WE_ARE_NOT_DOING_YET_FIXME_ONE_DAY = longdbl
 
@@ -1569,6 +1574,12 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
+  pawk/test_ether.awk \
+  pawk/test_ip.awk \
+  pawk/test_ip_tsaddr.awk \
+  pawk/test_ip_ts.awk \
+  pawk/test_rtt.awk \
+  pawk/test_tcp.awk
 
 # Message stuff is to make it a little easier to follow.
 # Make the pass-fail last and dependent on others to avoid
@@ -1607,6 +1618,12 @@ extra:	$(EXTRA_TESTS) inet
 inet:	inetmesg $(INET_TESTS)
 
 machine-tests: $(MACHINE_TESTS)
+
+# Define run_pcap_analysis target
+run_pcap_analysis: $(srcdir)/test/pawk/run_test.sh
+	$(srcdir)/test/pawk/run_test.sh
+
+.PHONY: run_pcap_analysis
 
 # The blank between ' and /MPFR/ is for running tests on Windows under
 # MSYS, which thinks /MPFR is a Unix-style file name and converts it
@@ -2175,7 +2192,7 @@ profile1:
 	@$(AWK) --pretty-print=ap-$@.out -f "$(srcdir)"/xref.awk "$(srcdir)"/dtdgport.awk > _$@.out1
 	@$(AWK) -f ./ap-$@.out "$(srcdir)"/dtdgport.awk > _$@.out2 ; rm ap-$@.out
 	@$(CMP) _$@.out1 _$@.out2 && rm _$@.out[12] || { echo EXIT CODE: $$? >>_$@ ; \
-	cp "$(srcdir)"/dtdgport.awk > $@.ok ; }
+	cp "$(srcdir)"/dtdgport.awk > $@.ok ; }	
 
 profile2:
 	@echo $@
