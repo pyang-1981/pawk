@@ -12,7 +12,7 @@ for t in $tests; do
         echo $t
         script=`echo "$t" | cut -d ',' -f1`
         pcap=`echo "$t" | cut -d ',' -f2`
-        echo "gawk -lreadpcap -a -f $script $pcap"
-        ../../gawk -lreadpcap -a -f $script $pcap
+        echo "pawk -lreadpcap -a -f $script $pcap"
+        ../../pawk -lreadpcap -a -f $script $pcap
         if [ $? -ne 0 ]; then exit -1; fi
 done
