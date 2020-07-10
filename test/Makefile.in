@@ -1620,8 +1620,8 @@ inet:	inetmesg $(INET_TESTS)
 machine-tests: $(MACHINE_TESTS)
 
 # Define run_pcap_analysis target
-run_pcap_analysis: $(srcdir)/test/pawk/run_test.sh
-	$(srcdir)/test/pawk/run_test.sh
+run_pcap_analysis: $(srcdir)/pawk/run_tests.sh
+	@pushd $(srcdir)/pawk; ./run_tests.sh; popd
 
 .PHONY: run_pcap_analysis
 
