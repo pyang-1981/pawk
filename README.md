@@ -95,7 +95,7 @@ pawk -lreadpcap -a -f [script] [pcap]
 where the *script* is the path to the code, and *pcap* is the path to the packet capture.
 
 ## Documentation
-PAWK build and installation  
+[PAWK build and installation](INSTALL.md)  
 PAWK commandline options  
 PAWK tutorial  
 PAWK network fields and builtin functions  

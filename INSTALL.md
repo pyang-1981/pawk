@@ -7,20 +7,21 @@ I wish we can do without autotools, since it should be only needed by the mainta
 You should install LIBPCAP from your OS distribution. The dev-version is needed, since it has development header files.
 
 ## Build
-From the source directory, do
+From the top level source directory, do
 ```bash
 autoreconf -fvi
 ./configure
 make
 ```
-
-Before installation, check the pawk by running some simple pcap analysis scripts. Do the following from the source directory.
+Before installation, check the pawk by running some pcap analysis scripts. Do the following from the test subdirectory.
 ```bash
+cd test
 make run_pcap_analysis
 ```
+If everything is fine, it should print *"Run x tests, everything is fine"*
 
 ## Installation
-If everything is fine, install the pawk by running
+If everything is fine, install the pawk by running the following from the top level source directory.
 ```bash
 sudo make install
 ```
