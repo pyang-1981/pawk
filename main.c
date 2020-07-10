@@ -583,7 +583,7 @@ usage(int exitval, FILE *fp)
 	/* GNU long options info. This is too many options. */
 
 	fputs(_("POSIX options:\t\tGNU long options: (standard)\n"), fp);
-	fputs(_("\t-a pcap/live\t\t--pcap=pcap/live\n"), fp);
+	fputs(_("\t-aoffline/live\t\t--pcap=offline/live\n"), fp);
 	fputs(_("\t-f progfile\t\t--file=progfile\n"), fp);
 	fputs(_("\t-F fs\t\t\t--field-separator=fs\n"), fp);
 	fputs(_("\t-v var=val\t\t--assign=var=val\n"), fp);
@@ -1447,11 +1447,15 @@ parse_args(int argc, char **argv)
 
 		switch (c) {
 		case 'a':
-		  if (optarg == NULL || optarg[0] == '\0')
+		  if (optarg == NULL || optarg[0] == '\0'
+          || strcmp("offline", optarg) == 0)
 		    do_flags |= DO_PCAP_OFFLINE;
-		  else if (strncmp("live", optarg, 4) == 0)
+		  else if (strcmp("live", optarg) == 0) {
 		    do_flags |= DO_PCAP_LIVE;
-		  break;	  
+        fprintf(stderr, _("live mode is not supported yet\n"));
+        usage(EXIT_FAILURE, stderr);
+      }
+		  break;
 		case 'F':
 			add_preassign(PRE_ASSIGN_FS, optarg);
 			break;
