@@ -8,7 +8,7 @@ PAWK adopts an AWK-like workflow (it is in fact an extension of GNU AWK with sli
 Let's demonstrate the analysis workflow by a example.
 
 ### Naive Average TCP RTT Analysis
-Suppose we have a TCP packet capture. Each RTT sample can be calculated by the time difference between the time when a packet is sent and the time when the corresponding acknowledgment packet is received. We also want to ignore the duplicate acknowledgment packets, since the RTT samples calculated using them are not accurate. In addition, we ignore the first new acknowledgment packet after the duplicate acknowledgment packets, since it may triggered by a retransmission. Below is the analysis code for calculating the average RTT between two IP addresses 145.254.160.237 (as the sender) and 65.208.228.223 (as the receiver).
+Suppose we have a TCP packet capture. Each RTT sample can be calculated by the time difference between the time when a packet is sent and the time when the corresponding acknowledgment packet is received. We also want to ignore the duplicate acknowledgment packets, since the RTT samples calculated using them are not accurate. In addition, we ignore the first new acknowledgment packet after the duplicate acknowledgment packets, since it may be triggered by a retransmission. Below is the analysis code for calculating the average RTT between two IP addresses 145.254.160.237 (as the sender) and 65.208.228.223 (as the receiver).
 ```
 BEGIN {
     avg_rtt = 0
@@ -72,7 +72,7 @@ For anyone who is familiar with AWK, this piece of code is easy to understand. J
 
 PAWK code just like AWK code consists of one or more **blocks**, each of which is enclosed by a pair of braces and contains user code. A **block** can have a header, such as *BEGIN*, *END*, etc, specifying on which condition the block will be executed. For example a *BEGIN* block will be executed once when the execution is started and a *END* block will be executed once when the execution is finished. Besides *BEGIN* and *END*, any valid boolean expression can serve as a header. If the expression is evaluated to **true**, the corresponding block will be executed for the current packet. For example the header *$.IPv4.src_addr == "65.208.228.223"* specifies that the block will only be executed if the IPv4 source address of the current packet is *"65.208.228.223"*.
 
-Different from AWK code, PAWK code adds some new syntax to access the network fields of the current packet. *\$* refers to the current packet. A network field can be accessed by *\$.protocol.field*. For example, *\$.TCP.ack* refers to the *ack* bit of the *TCP* protocol of the current packet. For the network fields that do not belong to any protocol, such as the timestamp, we assume they belong to a fictional protocol called *PKT*.
+Different from AWK code, PAWK code adds some new syntax to access the network fields of the current packet. *\$* refers to the current packet. A network field can be accessed by *\$.protocol.field*. For example, *\$.TCP.ack* refers to the ACK bit of the TCP protocol of the current packet. For the network fields that do not belong to any protocol, such as the timestamp, we assume they belong to a fictional protocol called *PKT*.
 
 For a detailed description of all the available network fields, please refer to the documentation linked at the end of this README.
 
