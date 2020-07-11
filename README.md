@@ -90,7 +90,7 @@ Finally, when all the packet are read and processed, the *END* block is executed
 ## Invocation
 To run the above code against a packet capture, type
 ```
-pawk -lreadpcap -a -f [script] [pcap]
+pawk -lreadpcap -a -f script pcap
 ```
 where the *script* is the path to the code, and *pcap* is the path to the packet capture.
 
