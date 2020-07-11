@@ -96,6 +96,6 @@ where the *script* is the path to the code, and *pcap* is the path to the packet
 
 ## Documentation
 [PAWK build and installation](INSTALL.md)  
-PAWK commandline options  
+[PAWK commandline options](COMMANDLINE.md)  
 PAWK tutorial  
 PAWK network fields and builtin functions  
