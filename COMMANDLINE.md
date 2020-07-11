@@ -9,6 +9,6 @@ This option specifies the mode of the operation. There are two arguments: offlin
 
 ## Example
 ```bash
-pawk -lreadpcap -a [script] [pcap]
+pawk -lreadpcap -a -f [script] [pcap]
 ```
 *script* is the path to the analysis code, and *pcap* is the path to the packet capture file.
