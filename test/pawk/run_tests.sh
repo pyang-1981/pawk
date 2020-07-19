@@ -6,7 +6,8 @@ test_ip.awk,ping.pcap
 test_ip_ts.awk,ping_ts.pcap
 test_ip_tsaddr.awk,ping_tsaddr.pcap
 test_tcp.awk,http.pcap
-test_rtt.awk,http.pcap"
+test_rtt.awk,http.pcap
+test_ipv4frag.awk,ipv4frags.pcap"
 
 num_of_tests=0
 for t in $tests; do
