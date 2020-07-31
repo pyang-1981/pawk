@@ -99,6 +99,7 @@ Both *dst\_addr* and *src\_addr* are the string representation of the 32 bit IPv
 #### *option[n].\**
 *option[n].\** is used to access any network field within the nth option. For example *option[0].copied* is used to access the *copied* field of the first option. Currently PAWK supports all the common option fields, and IPv4 timestamp option specific fields. The common structure of an IPv4 option is shown below.
 ![IPv4 Option Structure](assets/option_structure.png)
+The number above each field is the length of the field in bits.
 
 ### IPv4 Option Common Network Fields
 IPv4 supports a range of options within the header, such as source routing, timestamp, etc. They share some common network fields listed below.
@@ -112,6 +113,11 @@ Field Name | Details |
 #### copied
 Set to 1 if this option need to be presented in every IPv4 fragment. Set to 0 otherwise.
 
+#### class
+Only number 0 and 2 is allowed. Different options have different class values.
+
+#### number
+Uniquely identify an option within a class, e.g, the IPv4 timestamp option has a *number* of 4 with a *class* of 2.
 
 
 
