@@ -119,8 +119,15 @@ Only number 0 and 2 is allowed. Different options have different class values.
 #### number
 Uniquely identify an option within a class, e.g, the IPv4 timestamp option has a *number* of 4 with a *class* of 2.
 
+### IPv4 Option Timestamp Network Fields
+The timestmap option allows a device (routers/end hosts) on a path from a source to a destination adds a timestamp in the IPv4 header when it receives an IPv4 packet. It has the following structure.
+![IPv4 Timestamp Option Structure](assets/ipv4_timestamp_option_structure.png)  
 
 
+
+    
+
+    
 
 
 
