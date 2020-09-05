@@ -111,17 +111,36 @@ Field Name | Details |
 | number | option number |
 
 #### copied
-Set to 1 if this option need to be presented in every IPv4 fragment. Set to 0 otherwise.
+Can be accessed by *$.IPv4.option[n].copied*. It is set to 1 if this option need to be presented in every IPv4 fragment. Set to 0 otherwise.
 
 #### class
-Only number 0 and 2 is allowed. Different options have different class values.
+Can be accessed by *$.IPv4.option[n].class*. Only number 0 and 2 is allowed. Different options have different class values.
 
 #### number
-Uniquely identify an option within a class, e.g, the IPv4 timestamp option has a *number* of 4 with a *class* of 2.
+Can be accessed by *$.IPv4.option[n].number*. Uniquely identify an option within a class, e.g, the IPv4 timestamp option has a *number* of 4 with a *class* of 2.
 
 ### IPv4 Option Timestamp Network Fields
 The timestmap option allows a device (routers/end hosts) on a path from a source to a destination adds a timestamp in the IPv4 header when it receives an IPv4 packet. It has the following structure.
 ![IPv4 Timestamp Option Structure](assets/ipv4_timestamp_option_structure.png)  
+
+#### len
+Can be accessed by *$.IPv4.option[n].len*. Length of the IPv4 timestamp option in bytes. The length includes the common network fields of an IPv4 option.
+
+#### ptr
+Can be accessed by *$.IPv4.option[n].ptr*. The byte offset from the beginning of the option (i.e., the *copied* field) to the current end of the option plus 1, that is, it is pointing to the starting position of the next timestamp. A device on a path can use this field to quickly locate the place where it can append its timestamp to the option.
+
+#### oflw
+Can be accessed by *$.IPv4.option[n].oflw*. The number of devices that cannot append their timestamps due to the lack of spaces.
+
+#### flg
+Can be accessed by *$.IPv4.option[n].flg*. Flag that indicates the format of the timestamps in the option.
+
+Flag | Details |
+| --- | --- |
+| 0 | Timestamp contains only time field |
+| 1 | Timestamp contains IP address and time fields |
+| 3 | The IP address fields are pre-specified. A device only appends its timestamp if current IP address matches its own address |
+
 
 
 
