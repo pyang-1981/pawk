@@ -141,6 +141,14 @@ Flag | Details |
 | 1 | Timestamp contains IP address and time fields |
 | 3 | The IP address fields are pre-specified. A device only appends its timestamp if current IP address matches its own address |
 
+Flag 0 means each timestamp contains a 32 bit integer representing the milliseconds since midnight UT. Flag 1 means each timestamp contains two 32 bit integers of which the first one is the IP address of the device which inserts this timestamp, and the second one is the milliseconds since midnight UT. Flag 3 is basically the same as Flag 1, except that the IP addresses are pre-specified.
+
+#### addr
+Can be accessed by *$.IPv4.option[n].addr[m]*. The IP address of the *m*th timestamp.
+
+#### ts
+Can be accessed by *$.IPv4.option[n].ts[m]*. The milliseconds of the *m*th timestamp.
+
 
 
 
