@@ -1,4 +1,4 @@
-function assert_function assert_equal(expected, real) {
+function assert_equal(expected, real) {
     if (expected != real) {
         printf "Expect "expected" Got "real"\n"
         exit -1

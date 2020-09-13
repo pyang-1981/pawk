@@ -291,6 +291,9 @@ get_ipv4_ts_opt_addr(const u_char *buf, size_t buf_size, ...);
 static struct net_field *
 get_ipv4_ts_opt_ts(const u_char *buf, size_t buf_size, ...);
 
+static struct net_field *
+get_ipv4_ts_opt_ts_len(const u_char *buf, size_t buf_size, ...);
+
 static struct ipv4_opt_descriptor ipv4_opt_ts_fields[] = {
   {.name = "len", .field_func = get_ipv4_ts_opt_len},
   {.name = "ptr", .field_func = get_ipv4_ts_opt_ptr},
@@ -298,6 +301,7 @@ static struct ipv4_opt_descriptor ipv4_opt_ts_fields[] = {
   {.name = "flg", .field_func = get_ipv4_ts_opt_flg},
   {.name = "addr\\[\\([0-9]\\|[1-9][0-9]*\\)\\]", .field_func = get_ipv4_ts_opt_addr, .is_regex = true},
   {.name = "ts\\[\\([0-9]\\|[1-9][0-9]*\\)\\]", .field_func = get_ipv4_ts_opt_ts, .is_regex = true} ,
+  {.name = "ts_len", .field_func = get_ipv4_ts_opt_ts_len, .is_regex = false},
   {.name = NULL}
 };
 
@@ -976,7 +980,7 @@ get_ipv4_ts_opt_addr(const u_char *buf, size_t buf_len, ...)
 
   // Get the option index
   int idx = extract_opt_index(qual_field_name, rcomp);
-  if ((idx + 1) * 8 > ((ptr > len) ? len : ptr) - 4) {
+  if ((idx + 1) * 8 > ((ptr > len) ? len : ptr - 1) - 4) {
     va_end(ap);
     do_fatal("option index out of bound: have %d bytes of timestamps, "
 	          "requested timestamp extends to %d bytes",
@@ -1039,7 +1043,7 @@ get_ipv4_ts_opt_ts(const u_char *buf, size_t buf_len, ...)
 
   // Get the option index
   int idx = extract_opt_index(qual_field_name, rcomp);
-  if ((idx + 1) * (flg == 0? 4 : 8) > (ptr > len ? len : ptr) - 4) {
+  if ((idx + 1) * (flg == 0? 4 : 8) > (ptr > len ? len : ptr - 1) - 4) {
       va_end(ap);
       do_fatal("option index out of bound: have %d bytes of timestamps, "
       	          "requested timestamp extends to %d bytes",
@@ -1064,4 +1068,29 @@ get_ipv4_ts_opt_ts(const u_char *buf, size_t buf_len, ...)
   return nf;
 }
 
+static struct net_field*
+get_ipv4_ts_opt_ts_len(const u_char *buf, size_t buf_len, ...)
+{
+  CHK_TS_BUF_LEN(buf, buf_len);
+
+  struct net_field *flg_field = get_ipv4_ts_opt_flg(buf, buf_len);
+  int flg =flg_field->num_val;
+  free(flg_field);
+
+  // Get the length field
+  struct net_field *len_field = get_ipv4_ts_opt_len(buf, buf_len);
+  int len = len_field->num_val;
+  free(len_field);
+
+  // Get the pointer field
+  struct net_field *ptr_field = get_ipv4_ts_opt_ptr(buf, buf_len);
+  int ptr = ptr_field->num_val;
+  free(ptr_field);
+
+  INIT_NET_FIELD(nf);
+  nf->num_val = ((ptr > len ? len : ptr - 1) - 4) / (flg == 0 ? 4 : 8);
+  nf->type = awk_numbr_t;
+
+  return nf;
+}
 
