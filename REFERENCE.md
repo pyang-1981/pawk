@@ -149,6 +149,9 @@ Can be accessed by *$.IPv4.option[n].addr[m]*. The IP address of the *m*th times
 #### ts
 Can be accessed by *$.IPv4.option[n].ts[m]*. The milliseconds of the *m*th timestamp.
 
+#### ts_len
+Can be accessed by *$.IPv4.option[n].ts\_len*. The number of timestamp entries in the option.
+
 
 
 
