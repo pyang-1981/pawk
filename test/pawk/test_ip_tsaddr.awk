@@ -21,5 +21,6 @@ function assert_equal(expected, real) {
     assert_equal(63312907, $.IPv4.option[0].ts[2])
     assert_equal("192.168.2.1", $.IPv4.option[0].addr[3])
     assert_equal(63312903, $.IPv4.option[0].ts[3])
+    assert_equal(4, $.IPv4.option[0].ts_len)
     exit 0
 }

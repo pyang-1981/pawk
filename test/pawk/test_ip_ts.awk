@@ -22,5 +22,6 @@ function assert_equal(expected, real) {
     assert_equal(13841759, $.IPv4.option[0].ts[4])
     assert_equal(13841778, $.IPv4.option[0].ts[5])
     assert_equal(13841773, $.IPv4.option[0].ts[6])
+    assert_equal(7, $.IPv4.option[0].ts_len)
     exit 0
 }
