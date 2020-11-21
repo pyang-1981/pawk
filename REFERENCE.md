@@ -150,12 +150,32 @@ Can be accessed by *$.IPv4.option[n].addr[m]*. The IP address of the *m*th times
 Can be accessed by *$.IPv4.option[n].ts[m]*. The milliseconds of the *m*th timestamp.
 
 #### ts_len
-Can be accessed by *$.IPv4.option[n].ts\_len*. The number of timestamp entries in the option.
+Can be accessed by *$.IPv4.option[n].ts\_len*. The number of timestamp entries in the option. This field can be used in a for loop to access each timestamp entry.
 
+###TCP Network Fields
+TCP network fields are accessed by *\$.TCP.\**, where "*" can be
 
+| Field Name | Details                               |
+| ---        | ---                                   |
+| src\_port  | Source port                           |
+| dst\_port  | Destination port                      |
+| seq        | Sequence number                       |
+| ackno      | Acknowledgment number                 |
+| resv       | Reserved bits                         |
+| doff       | Data offset                           |
+| fin        | fin flag                              |
+| syn        | syn flag                              |
+| rst        | Reset flag                            |
+| psh        | Push flag                             |
+| ack        | Acknowledgment flag                   |
+| urg        | Urgent flag                           |
+| ece        | Explicit congestion echo flag |
+| cwr        | Congestion window reduced flag        |
+| ns         | ECN-nonce flag                        |
+| rwin       | Receiver window size                  |
+| chk        | Checksum                              |
+| urg_ptr    | Offset pointing to the last urgent byte |
 
-
-    
 
     
 

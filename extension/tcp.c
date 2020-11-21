@@ -117,7 +117,7 @@ static struct net_field_descriptor tcp_fields[] = {
   {.name = "ece", .is_regex = false, .field_func = get_tcp_ece},
   {.name = "cwr", .is_regex = false, .field_func = get_tcp_cwr},
   {.name = "ns", .is_regex = false, .field_func = get_tcp_ns},
-  {.name = "cwin", .is_regex = false, .field_func = get_tcp_win},
+  {.name = "rwin", .is_regex = false, .field_func = get_tcp_win},
   {.name = "chk", .is_regex = false, .field_func = get_tcp_chk},
   {.name = "urg_ptr", .is_regex = false, .field_func = get_tcp_urg_ptr},
   {.name = NULL, .field_func = NULL}
