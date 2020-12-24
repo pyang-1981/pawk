@@ -228,7 +228,7 @@ Can be accessed by *$.TCP.rwin*. The **receiver window size**. This field togeth
 Can be accessed by *$.TCP.chk*. The **checksum**. This field is used to verify the integrity of the TCP packet. It is calculated by using CRC over the TCP header, the payload, and pseudo-header consisting of the source and destination IP addresses, the TCP protocol number, the size of the TCP header, and payload (in bytes).
 
 #### urg_ptr
-Can be accessed by *$.TCP.urg_ptr*. The **urgent pointer**. If the **urgent** flag is set, this field is the offset from the sequence number indicating the last urgent data byte. The urgent data is delivered out of order immediately to the receiver without delivering the buffered data before it. Practically, the urgent data feature is rarely used, and may behave quite differently from what one normally think.
+Can be accessed by *$.TCP.urg_ptr*. The **urgent pointer**. If the **urgent** flag is set, this field is the offset from the sequence number indicating the last urgent data byte. The urgent data is delivered out of order immediately to the receiver without delivering the buffered data before it. Practically, the urgent data feature is rarely used, and may behave quite differently from what one normally thinks.
 
 
 
