@@ -316,31 +316,31 @@ static struct ipv4_opt_descriptor*  ipv4_opt_num_mapping[] = {
   ipv4_opt_ts_fields,
   NULL,
   NULL,
-  NULL, 
   NULL,
   NULL,
   NULL,
-  NULL, 
   NULL,
   NULL,
   NULL,
-  NULL, 
   NULL,
   NULL,
   NULL,
-  NULL, 
   NULL,
   NULL,
   NULL,
-  NULL, 
   NULL,
   NULL,
   NULL,
-  NULL, 
   NULL,
   NULL,
   NULL,
-  NULL, 
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
 };
 
 static int
@@ -432,11 +432,11 @@ get_ipv4_dst_addr(const u_char* buf, size_t buf_len, ...)
 
   struct ip *header;
   INIT_NET_FIELD(nf);
-	
+
   char *dst_addr = (char *)malloc(IPV4_ADDR_REPR_LEN);
   if (dst_addr == NULL)
     do_fatal("can not allocate IPv4 destination address");
-    
+
   header = (struct ip *)buf;
   if (inet_ntop(AF_INET, &header->ip_dst.s_addr, dst_addr,
 		IPV4_ADDR_REPR_LEN) == NULL) {
@@ -447,7 +447,7 @@ get_ipv4_dst_addr(const u_char* buf, size_t buf_len, ...)
   nf->str_val = dst_addr;
   nf->str_len = strlen(dst_addr) ;
   nf->type = awk_str_t;
-	
+
   return nf;
 }
 
@@ -458,12 +458,12 @@ get_ipv4_src_addr(const u_char  *buf, size_t buf_len, ...)
 
   struct ip *header;
   INIT_NET_FIELD(nf);
-	
+
   char *src_addr = (char *)malloc(IPV4_ADDR_REPR_LEN);
   if (src_addr == NULL) {
     do_fatal("can not allocate IPv4 source address");
   }
-    
+
   header = (struct ip *)buf;
   if (inet_ntop(AF_INET, &header->ip_src.s_addr, src_addr,
 		IPV4_ADDR_REPR_LEN) == NULL) {
@@ -474,7 +474,7 @@ get_ipv4_src_addr(const u_char  *buf, size_t buf_len, ...)
   nf->str_val = src_addr;
   nf->str_len = strlen(src_addr);
   nf->type = awk_str_t;
-	
+
   return nf;
 }
 
@@ -643,7 +643,7 @@ get_ipv4_payload(const u_char *buf, size_t buf_len, ...)
 
   nf->bin_val = (u_char *)malloc(buf_len - hlen);
   if (nf->bin_val == NULL) {
-    do_fatal("can not allocate IPv4 payload");     
+    do_fatal("can not allocate IPv4 payload");
   }
 
   nf->type = awk_bin_t;
@@ -675,12 +675,12 @@ advance_to_opt_header(const u_char *buf, size_t buf_len, int n)
       opt_header = (struct ip_option_header *)((u_char *)opt_header + opt_len);
     }
     else if (opt_header->ip_opt_num == 8) {
-      opt_header = (struct ip_option_header *)((u_char *)opt_header + 4);  
+      opt_header = (struct ip_option_header *)((u_char *)opt_header + 4);
     }
     else {
       do_fatal("unknown IPv4 option, option number: %d",
 	       opt_header->ip_opt_num);
-    }  
+    }
   }
 
   if ((const u_char *)opt_header - buf > hdr_len) {
@@ -725,7 +725,7 @@ static struct net_field *
 get_ipv4_opt_len(const u_char *buf, size_t buf_len, ...)
 {
   int len = 0;
-  struct ip_option_header *opt_header 
+  struct ip_option_header *opt_header
     = (struct ip_option_header *)(buf + IPV4_MIN_HDR_LEN);
   struct ip *header = (struct ip *)buf;
   int hdr_len = header->ip_hl << 2;
@@ -748,7 +748,7 @@ get_ipv4_opt_len(const u_char *buf, size_t buf_len, ...)
       opt_header = (struct ip_option_header *)((u_char *)opt_header + opt_len);
     }
     else if (opt_header->ip_opt_num == 8) {
-      opt_header = (struct ip_option_header *)((u_char *)opt_header + 4);  
+      opt_header = (struct ip_option_header *)((u_char *)opt_header + 4);
     }
     else {
       do_fatal("Unknown IPv4 option, option number: %d",
@@ -892,7 +892,7 @@ get_ipv4_ts_opt_len(const u_char *buf, size_t buf_len, ...)
   }
   INIT_NET_FIELD(nf);
   struct ip_timestamp *opt_header = (struct ip_timestamp *)buf;
-  
+
   nf->type = awk_numbr_t;
   nf->num_val = opt_header->ipt_len;
 

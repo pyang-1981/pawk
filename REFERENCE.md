@@ -176,6 +176,67 @@ TCP network fields are accessed by *\$.TCP.\**, where "*" can be
 | chk        | Checksum                              |
 | urg_ptr    | Offset pointing to the last urgent byte |
 
+#### src\_port
+Can be accessed by *$.TCP.src\_port*. The source port of a TCP packet.
+
+#### dst\_port
+Can be accessed by *$.TCP.dst\_port*. The destination port of a TCP packet.
+
+#### seq
+Can be accessed by *$.TCP.seq*. The sequence number of a TCP packet.
+
+#### ackno
+Can be accessed by *$.TCP.ackno*. The acknowledgment number of a TCP packet.
+
+#### resv
+Can be accessed by *$.TCP.resv*. The reserved bits of a TCP packet, for future use, and set to 0s for now.
+
+#### doff
+Can be accessed by *$.TCP.doff*. The size of the TCP header in 32-bit words. The minimum value is 5 allowing a header of 20 bytes, the maximum value is 15, allowing a header of 60 bytes.
+
+#### fin
+Can be accessed by *$.TCP.fin*. The **fin** flag. If set, the current TCP packet is a **fin** packet.
+
+#### syn
+Can be accessed by *$.TCP.syn*. The **syn** flag. If set, the current TCP packet is a **syn** packet.
+
+#### rst
+Can be accessed by *$.TCP.rst*. The **reset** flag. If set, the current TCP packet is a **rst** packet.
+
+#### psh
+Can be accessed by *$.TCP.psh*. The **push** flag. If set, the sender will push all the buffered data to the network immediately; the receiver will deliver all the buffered data to the application immediately after receiving a packet with **push** flag set. It is mostly used in the interactive programs where a low latency is of utmost importance. However, it does lower the transmission efficiency, since only a little data is sent in every packet.
+
+#### ack
+Can be accessed by *$.TCP.ack*. The **acknowledgment** flag. If set, the current TCP header contains a valid acknowledgment number.
+
+#### urg
+Can be accessed by *$.TCP.urg*. The **urgent** flag. If set, the current TCP header contains a valid **urgent pointer**.
+
+#### ece
+Can be accessed by *$.TCP.ece*. The **explicit congestion echo** flag. If set along with a set **syn** flag, it means that the TCP peer is **ECN** capable. If set with a cleared **syn** flag, it means that a congestion event has happened, and the receiver sends this packet to notify the sender about the event. The whole notification process starts with a router setting the **ecn** flag in the IP header of the packet sent by the sender to indicate that a network congestion event is underway. Upon receiving the packet, the receiver set the **ece** flag in the TCP acknowledgment packet sent to the sender. Upon seeing this flag, the sender can reduce the transmission rate by reducing the congestion window.
+
+#### cwr
+Can be accessed by *$.TCP.cwr*. The **congestion window reduced** flag. This flag is set by the sender and sent to the receiver as the response of a set **ece** flag, to notify the receiver that the congestion window is reduced so that the receiver can stop setting the **ece** flag in the TCP acknowledgment packets.
+
+#### ns
+Can be accessed by *$.TCP.ns*. The **ECN-nonce** flag. 
+
+#### rwin
+Can be accessed by *$.TCP.rwin*. The **receiver window size**. This field together with an optional **window scaling factor** determines the receiver window size.
+
+#### chk
+Can be accessed by *$.TCP.chk*. The **checksum**. This field is used to verify the integrity of the TCP packet. It is calculated by using CRC over the TCP header, the payload, and pseudo-header consisting of the source and destination IP addresses, the TCP protocol number, the size of the TCP header, and payload (in bytes).
+
+#### urg_ptr
+Can be accessed by *$.TCP.urg_ptr*. The **urgent pointer**. If the **urgent** flag is set, this field is the offset from the sequence number indicating the last urgent data byte. The urgent data is delivered out of order immediately to the receiver without delivering the buffered data before it. Practically, the urgent data feature is rarely used, and may behave quite differently from what one normally think.
+
+
+
+
+
+
+
+
 
     
 
